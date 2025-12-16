@@ -22,7 +22,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
+  # This job will build your site and deploy it
   deploy:
     environment:
       name: github-pages
@@ -31,16 +31,29 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      
+      # 1. Install Dependencies and Build the Project (Creates the 'dist' folder)
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Use a standard, current Node version
+      - name: Install Dependencies
+        run: npm install
+      - name: Build Project
+        run: npm run build
+      
+      # 2. Configure GitHub Pages
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      
+      # 3. Upload the Built Artifact (CRITICAL FIX: Uses the 'dist' folder)
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # UPLOAD THE FILES FROM THE 'dist' FOLDER
-          path: dist 
+          # This line tells the action to look inside the 'dist' folder for files
+          path: 'dist'  
+          
+      # 4. Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          # The path is now correctly set to 'dist' in the 'Upload artifact' step above.
-          # We leave this 'with' blank as it uses the uploaded artifact.

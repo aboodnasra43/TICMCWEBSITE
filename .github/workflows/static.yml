@@ -1,28 +1,12 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+name: Deploy TICMCWEBSITE
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-  - name: Install Dependencies
-        # 🌟 CRITICAL FIX: Change directory before running npm install 🌟
-        run: |
-          cd source_code
-          npm install
-
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+# Allow only one concurrent deployment, skipping runs queued
+# when a run is in-progress and latest queued.
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -37,29 +21,33 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
-      # 1. Install Dependencies and Build the Project (Creates the 'dist' folder)
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Use a standard, current Node version
+          # CRITICAL FIX 1: Use modern Node for Vite
+          node-version: '18' 
+
+      # CRITICAL FIX 2: Install dependencies inside the source_code folder
       - name: Install Dependencies
         run: npm install
+        working-directory: source_code
+
+      # CRITICAL FIX 3: Build the project inside the source_code folder
       - name: Build Project
         run: npm run build
-      
-      # 2. Configure GitHub Pages
+        working-directory: source_code
+
       - name: Setup Pages
-        uses: actions/configure-pages@v5
-      
-      # 3. Upload the Built Artifact (CRITICAL FIX: Uses the 'dist' folder)
+        uses: actions/configure-pages@v4
+
+      # CRITICAL FIX 4: Upload the built 'dist' folder
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # This line tells the action to look inside the 'dist' folder for files
-          path: 'dist'  
-          
-      # 4. Deploy to GitHub Pages
+          # This line tells the action to look inside 'source_code/dist'
+          path: 'source_code/dist' 
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

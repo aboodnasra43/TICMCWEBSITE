@@ -36,8 +36,11 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: '.'
+          # UPLOAD THE FILES FROM THE 'dist' FOLDER
+          path: dist 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # The path is now correctly set to 'dist' in the 'Upload artifact' step above.
+          # We leave this 'with' blank as it uses the uploaded artifact.
